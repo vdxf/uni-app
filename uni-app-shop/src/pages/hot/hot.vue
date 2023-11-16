@@ -16,9 +16,7 @@ const query = reactive<HotParame>({
 const HotInfo = ref<HotData>()
 const HotList = ref<Hot[]>([])
 const activeIndex = ref<number>(0)
-const count = ref<number>(0)
 const isFinished = ref<boolean>(false)
-const isLoading = ref<boolean>(true)
 const hotMap = [
   { type: '1', title: '特惠推荐', url: '/hot/preference' },
   { type: '2', title: '爆款推荐', url: '/hot/inVogue' },
@@ -32,22 +30,17 @@ onLoad(async () => {
   await getData()
 })
 const getData = async () => {
-  const index = activeIndex.value
-  isLoading.value = false
   const res = await reqHotData(query, current.value.url)
   HotInfo.value = res.result
   HotList.value = res.result.subTypes
-  count.value = res.result.subTypes[index].goodsItems.counts
-  isLoading.value = true
 }
 //触底加载更多
 const handleReachBottom = async () => {
-  if (query.page! * query.pageSize! >= count.value) {
+  const currsub = HotList.value[activeIndex.value]
+  if (currsub.goodsItems.page! > currsub.goodsItems.pages) {
     isFinished.value = true
     return
   }
-  if (!isLoading.value) return
-  const currsub = HotList.value[activeIndex.value]
   currsub.goodsItems.page!++
   query.page = currsub.goodsItems.page
   query.subType = currsub.id
