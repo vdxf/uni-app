@@ -21,7 +21,7 @@ import { reqBannerList, reqCategoryList, reqHotPanel } from '@/api/home'
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import type { BannerItem, CategoryItem, HotPanelItem } from '@/api/home/type'
-import type { GuessLikeInstance } from '@/components/type'
+import { useGuessList } from '@/hooks'
 
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CategoryItem[]>([])
@@ -47,20 +47,11 @@ const getHotPanel = async () => {
   hotPanel.value = res.result
 }
 
-const guessRef = ref<GuessLikeInstance>()
-//上拉加载
-const handleReachBottom = () => {
-  guessRef.value?.handleMore()
-}
+const { guessRef, handleReachBottom, handleGuessRefresh } = useGuessList()
 //下拉刷新
 const handleRefresh = async () => {
   isFreash.value = true
-  await Promise.all([
-    getBannerList(),
-    getCategoryList(),
-    getHotPanel(),
-    guessRef.value?.handleRefresh(),
-  ])
+  await Promise.all([getBannerList(), getCategoryList(), getHotPanel(), handleGuessRefresh()])
   isFreash.value = false
 }
 </script>

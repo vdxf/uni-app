@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { useMemberStore } from '@/stores'
+import GuessLike from '@/components/GuessLike.vue'
+import { useGuessList } from '@/hooks'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // 订单选项
@@ -8,28 +11,24 @@ const orderTypes = [
   { type: 3, text: '待收货', icon: 'icon-check' },
   { type: 4, text: '待评价', icon: 'icon-comment' },
 ]
+const memberStore = useMemberStore()
+const { guessRef, handleReachBottom } = useGuessList()
 </script>
 
 <template>
-  <scroll-view class="viewport" scroll-y enable-back-to-top>
+  <scroll-view @scrolltolower="handleReachBottom" class="viewport" scroll-y enable-back-to-top>
     <!-- 个人资料 -->
     <view class="profile" :style="{ paddingTop: safeAreaInsets!.top + 'px' }">
       <!-- 情况1：已登录 -->
-      <view class="overview" v-if="false">
-        <navigator url="/pagesMember/profile/profile" hover-class="none">
-          <image
-            class="avatar"
-            mode="aspectFill"
-            src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/uploads/avatar_3.jpg"
-          ></image>
+      <view class="overview" v-if="memberStore.profile">
+        <navigator url="/subPage/profile/profile" hover-class="none">
+          <image class="avatar" mode="aspectFill" :src="memberStore.profile.avatar"></image>
         </navigator>
         <view class="meta">
-          <view class="nickname"> 黑马程序员 </view>
-          <navigator
-            class="extra"
-            url="/pagesMember/profile/profile"
-            hover-class="none"
-          >
+          <view class="nickname">
+            {{ memberStore.profile.nickname || memberStore.profile.account }}
+          </view>
+          <navigator class="extra" url="/subPage/profile/profile" hover-class="none">
             <text class="update">更新头像昵称</text>
           </navigator>
         </view>
@@ -37,18 +36,12 @@ const orderTypes = [
       <!-- 情况2：未登录 -->
       <view class="overview" v-else>
         <navigator url="/pages/login/login" hover-class="none">
-          <image
-            class="avatar gray"
-            mode="aspectFill"
-            src="http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/picture/2021-04-06/db628d42-88a7-46e7-abb8-659448c33081.png"
-          ></image>
+          <image class="avatar gray" mode="aspectFill"
+            src="http://yjy-xiaotuxian-dev.oss-cn-beijing.aliyuncs.com/picture/2021-04-06/db628d42-88a7-46e7-abb8-659448c33081.png">
+          </image>
         </navigator>
         <view class="meta">
-          <navigator
-            url="/pages/login/login"
-            hover-class="none"
-            class="nickname"
-          >
+          <navigator url="/pages/login/login" hover-class="none" class="nickname">
             未登录
           </navigator>
           <view class="extra">
@@ -56,11 +49,7 @@ const orderTypes = [
           </view>
         </view>
       </view>
-      <navigator
-        class="settings"
-        url="/pagesMember/settings/settings"
-        hover-class="none"
-      >
+      <navigator class="settings" url="/subPage/setting/setting" hover-class="none">
         设置
       </navigator>
     </view>
@@ -68,24 +57,14 @@ const orderTypes = [
     <view class="orders">
       <view class="title">
         我的订单
-        <navigator
-          class="navigator"
-          url="/pagesOrder/list/list?type=0"
-          hover-class="none"
-        >
+        <navigator class="navigator" url="/pagesOrder/list/list?type=0" hover-class="none">
           查看全部订单<text class="icon-right"></text>
         </navigator>
       </view>
       <view class="section">
         <!-- 订单 -->
-        <navigator
-          v-for="item in orderTypes"
-          :key="item.type"
-          :class="item.icon"
-          :url="`/pagesOrder/list/list?type=${item.type}`"
-          class="navigator"
-          hover-class="none"
-        >
+        <navigator v-for="item in orderTypes" :key="item.type" :class="item.icon"
+          :url="`/pagesOrder/list/list?type=${item.type}`" class="navigator" hover-class="none">
           {{ item.text }}
         </navigator>
         <!-- 客服 -->
@@ -94,7 +73,7 @@ const orderTypes = [
     </view>
     <!-- 猜你喜欢 -->
     <view class="guess">
-      <XtxGuess ref="guessRef" />
+      <GuessLike ref="guessRef" />
     </view>
   </scroll-view>
 </template>
@@ -210,17 +189,20 @@ page {
     display: flex;
     justify-content: space-between;
     padding: 40rpx 20rpx 10rpx;
+
     .navigator,
     .contact {
       text-align: center;
       font-size: 24rpx;
       color: #333;
+
       &::before {
         display: block;
         font-size: 60rpx;
         color: #ff9545;
       }
     }
+
     .contact {
       padding: 0;
       margin: 0;
