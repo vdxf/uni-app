@@ -17,6 +17,3 @@ export interface UpdataUserInfo {
   cityCode?: string
   countyCode?: string
 }
-export interface UpdataUserInfoResponse extends UserInfoResult {
-  token: string
-}

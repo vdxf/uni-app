@@ -1,5 +1,5 @@
 import { $reuqest } from '@/utils/request'
-import type { UserInfoResult, UpdataUserInfo, UpdataUserInfoResponse } from './type'
+import type { UserInfoResult, UpdataUserInfo } from './type'
 
 //获取用户信息
 export const reqUserInfo = () => {
@@ -10,7 +10,7 @@ export const reqUserInfo = () => {
 }
 //修改用户信息
 export const reqUpdataUserInfo = (data: UpdataUserInfo) => {
-  return $reuqest<UpdataUserInfoResponse>({
+  return $reuqest<UserInfoResult>({
     url: '/member/profile',
     method: 'PUT',
     data,
