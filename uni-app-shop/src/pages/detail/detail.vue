@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { SkuPopupLocaldata } from '@/components/vk-vk-data-goods-sku-popup/type.ts'
 import ServiePanel from './components/ServicePanel.vue'
 import AddressPanel from './components/AddressPanel.vue'
 import { reqGoodsDetail } from '@/api/goodsDetail/index'
@@ -18,6 +19,28 @@ const goodsDetail = ref<GoodsDetail>()
 const getGoodsDetail = async () => {
   const res = await reqGoodsDetail({ id: props.id })
   goodsDetail.value = res.result
+  localdata.value = {
+    _id: res.result.id,
+    name: res.result.name,
+    goods_thumb: res.result.mainPictures[0],
+    spec_list: res.result.specs.map((i) => {
+      return {
+        name: i.name,
+        list: i.values,
+      }
+    }),
+    sku_list: res.result.skus.map((i) => {
+      return {
+        _id: i.id,
+        goods_id: res.result.id,
+        goods_name: res.result.name,
+        image: i.picture,
+        price: i.price,
+        stock: i.inventory,
+        sku_name_arr: i.specs.map((t) => t.valueName),
+      }
+    }),
+  }
 }
 //切换轮播图
 const currentIndex = ref<number>(0)
@@ -41,9 +64,15 @@ const handleOpenPopup = (name: typeof popupName.value) => {
   popupName.value = name
   popup.value?.open()
 }
+//控制显示SKU
+const isShowSKU = ref<boolean>(false)
+//商品信息
+const localdata = ref({} as SkuPopupLocaldata)
 </script>
 
 <template>
+  <!-- SKU弹窗组件 -->
+  <vk-data-goods-sku-popup v-model="isShowSKU" :localdata="localdata" />
   <scroll-view scroll-y class="viewport">
     <!-- 基本信息 -->
     <view class="goods">

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onLoad } from '@dcloudio/uni-app'
-import { reqAddressList } from '../../api/address'
+import { onShow } from '@dcloudio/uni-app'
+import { reqAddressList, reqDeleteAddress } from '../../api/address'
 import type { AddressItem } from '../../api/address/type'
 import { ref } from 'vue'
 
-onLoad(() => {
+onShow(() => {
   getAddressList()
 })
 const addressList = ref<AddressItem[]>([])
@@ -12,16 +12,28 @@ const getAddressList = async () => {
   const res = await reqAddressList()
   addressList.value = res.result
 }
+//删除
+const handleDelete = (id: string) => {
+  uni.showModal({
+    content: '确认是否删除此地址',
+    success: async (res) => {
+      if (res.confirm) {
+        await reqDeleteAddress(id)
+        getAddressList()
+      }
+    },
+  })
+}
 </script>
 
 <template>
   <view class="viewport">
     <!-- 地址列表 -->
     <scroll-view class="scroll-view" scroll-y>
-      <view v-if="true" class="address">
-        <view class="address-list">
+      <view v-if="addressList.length" class="address">
+        <uni-swipe-action class="address-list">
           <!-- 收货地址项 -->
-          <view class="item" v-for="item in addressList" :key="item.id">
+          <uni-swipe-action-item class="item" v-for="item in addressList" :key="item.id">
             <view class="item-content">
               <view class="user">
                 {{ item.receiver }}
@@ -33,8 +45,12 @@ const getAddressList = async () => {
                 修改
               </navigator>
             </view>
-          </view>
-        </view>
+            <!-- 右侧插槽 -->
+            <template #right>
+              <button @tap="handleDelete(item.id)" class="delete-btn">删除</button>
+            </template>
+          </uni-swipe-action-item>
+        </uni-swipe-action>
       </view>
       <view v-else class="blank">暂无收货地址</view>
     </scroll-view>
@@ -147,5 +163,13 @@ page {
   border-radius: 80rpx;
   font-size: 30rpx;
   background-color: #27ba9b;
+}
+
+.delete-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: red;
+  color: #fff;
 }
 </style>

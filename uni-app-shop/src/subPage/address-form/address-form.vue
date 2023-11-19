@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
-import { reqAddaddress, reqAddressInfo } from '../../api/address'
+import { reqAddaddress, reqAddressInfo, reqUpdateAddress } from '../../api/address'
 import type { AddressItem } from '@/api/address/type'
 
 // 表单数据
@@ -43,48 +43,79 @@ const handleAddCity: UniHelper.RegionPickerOnChange = (e) => {
 const handleSwitchChange: UniHelper.SwitchOnChange = (e) => {
   form.value.isDefault = e.detail.value ? 1 : 0
 }
-//添加新增地址
-const handleAddaddress = async () => {
-  await reqAddaddress(form.value)
-  uni.navigateBack()
-  uni.showToast({
-    icon: 'success',
-    title: '添加地址成功',
-  })
+//点击提交
+const formRef = ref<UniHelper.UniFormsInstance>()
+const handleSubmit = async () => {
+  try {
+    await formRef.value?.validate?.()
+    if (props.id) {
+      await reqUpdateAddress(form.value, props.id)
+    } else {
+      await reqAddaddress(form.value)
+    }
+    uni.navigateBack()
+    uni.showToast({
+      icon: 'success',
+      title: props.id ? '修改成功' : '添加成功',
+    })
+  } catch (err) {
+    uni.showToast({
+      icon: 'error',
+      title: '请填写完整信息',
+    })
+  }
+}
+//表单校验
+const rules: UniHelper.UniFormsRules = {
+  receiver: {
+    rules: [{ required: true, errorMessage: '请输入收货人姓名' }],
+  },
+  contact: {
+    rules: [
+      { required: true, errorMessage: '请输入联系方式' },
+      { pattern: /^1[3-9]\d{9}$/, errorMessage: '请输入正确的手机号' },
+    ],
+  },
+  fullLocation: {
+    rules: [{ required: true, errorMessage: '请选择所在地区' }],
+  },
+  address: {
+    rules: [{ required: true, errorMessage: '请填写详细地址' }],
+  },
 }
 </script>
 
 <template>
   <view class="content">
-    <form>
+    <uni-forms :rules="rules" ref="formRef" :modelValue="form">
       <!-- 表单内容 -->
-      <view class="form-item">
+      <uni-forms-item name="receiver" class="form-item">
         <text class="label">收货人</text>
         <input class="input" placeholder="请填写收货人姓名" v-model="form.receiver" />
-      </view>
-      <view class="form-item">
+      </uni-forms-item>
+      <uni-forms-item name="contact" class="form-item">
         <text class="label">手机号码</text>
         <input class="input" placeholder="请填写收货人手机号码" v-model="form.contact" />
-      </view>
-      <view class="form-item">
+      </uni-forms-item>
+      <uni-forms-item name="fullLocation" class="form-item">
         <text class="label">所在地区</text>
         <picker @change="handleAddCity" class="picker" mode="region" :value="form.fullLocation.split(' ')">
           <view v-if="form.fullLocation">{{ form.fullLocation }}</view>
           <view v-else class="placeholder">请选择省/市/区(县)</view>
         </picker>
-      </view>
-      <view class="form-item">
+      </uni-forms-item>
+      <uni-forms-item name="address" class="form-item">
         <text class="label">详细地址</text>
         <input class="input" placeholder="街道、楼牌号等信息" v-model="form.address" />
-      </view>
+      </uni-forms-item>
       <view class="form-item">
         <label class="label">设为默认地址</label>
         <switch @change="handleSwitchChange" class="switch" color="#27ba9b" :checked="form.isDefault === 1" />
       </view>
-    </form>
+    </uni-forms>
   </view>
   <!-- 提交按钮 -->
-  <button class="button" @tap="handleAddaddress">保存并使用</button>
+  <button class="button" @tap="handleSubmit">保存并使用</button>
 </template>
 
 <style lang="scss">

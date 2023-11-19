@@ -25,3 +25,20 @@ export const reqAddressInfo = (id: string) => {
     method: 'GET',
   })
 }
+
+//修改地址详情
+export const reqUpdateAddress = (data: AddaddressParams, id: string) => {
+  return $reuqest<{ id: string }>({
+    url: `/member/address/${id}`,
+    method: 'PUT',
+    data,
+  })
+}
+
+//删除地址详情
+export const reqDeleteAddress = (id: string) => {
+  return $reuqest<{ id: string }>({
+    url: `/member/address/${id}`,
+    method: 'DELETE',
+  })
+}
