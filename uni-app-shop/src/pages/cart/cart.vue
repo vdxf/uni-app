@@ -2,8 +2,17 @@
   <view class="app">
     <button @click="openSkuPopup()">打开SKU组件</button>
 
-    <vk-data-goods-sku-popup ref="skuPopup" v-model="skuKey" border-radius="20" :localdata="goodsInfo" :mode="skuMode"
-      @open="onOpenSkuPopup" @close="SkuPopup" @add-cart="addCart" @buy-now="buyNow"></vk-data-goods-sku-popup>
+    <vk-data-goods-sku-popup
+      ref="skuPopup"
+      v-model="skuKey"
+      border-radius="20"
+      :localdata="goodsInfo"
+      :mode="skuMode"
+      @open="onOpenSkuPopup"
+      @close="SkuPopup"
+      @add-cart="addCart"
+      @buy-now="buyNow"
+    ></vk-data-goods-sku-popup>
   </view>
 </template>
 

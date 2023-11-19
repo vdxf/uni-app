@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { SkuPopupLocaldata } from '@/components/vk-vk-data-goods-sku-popup/type.ts'
+import type { SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/type'
 import ServiePanel from './components/ServicePanel.vue'
 import AddressPanel from './components/AddressPanel.vue'
 import { reqGoodsDetail } from '@/api/goodsDetail/index'
@@ -102,7 +102,7 @@ const localdata = ref({} as SkuPopupLocaldata)
 
       <!-- 操作面板 -->
       <view class="action">
-        <view class="item arrow">
+        <view @tap="isShowSKU = true" class="item arrow">
           <text class="label">选择</text>
           <text class="text ellipsis"> 请选择商品规格 </text>
         </view>

@@ -1,4 +1,4 @@
-import { Component } from '@uni-helper/uni-app-types'
+import type { Component } from '@uni-helper/uni-app-types'
 
 /** SKU 弹出层 */
 export type SkuPopup = Component<SkuPopupProps>
