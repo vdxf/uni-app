@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onReady } from '@dcloudio/uni-app'
+import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import { reqAddaddress, reqAddressInfo } from '../../api/address'
+import type { AddressItem } from '@/api/address/type'
 
 // 表单数据
 const form = ref({
@@ -19,7 +20,7 @@ const props = defineProps<{
   id?: string
 }>()
 
-onReady(() => {
+onLoad(() => {
   uni.setNavigationBarTitle({ title: props.id ? '修改地址' : '新建地址' })
   getAddressInfo()
 })
@@ -27,7 +28,7 @@ onReady(() => {
 const getAddressInfo = async () => {
   if (props.id) {
     const res = await reqAddressInfo(props.id)
-    console.log('res => ', res)
+    Object.assign(form.value, res.result)
   }
 }
 //选择城市

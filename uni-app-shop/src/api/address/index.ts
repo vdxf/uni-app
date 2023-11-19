@@ -21,7 +21,7 @@ export const reqAddaddress = (data: AddaddressParams) => {
 //获取地址详情
 export const reqAddressInfo = (id: string) => {
   return $reuqest<AddressItem>({
-    url: `/member/adderss/`,
+    url: `/member/address/${id}`,
     method: 'GET',
   })
 }
