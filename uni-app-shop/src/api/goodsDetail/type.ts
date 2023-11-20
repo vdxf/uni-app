@@ -59,7 +59,7 @@ export interface Sku {
   inventory: number
   oldPrice: string
   picture: string
-  price: string
+  price: number
   skuCode: string
   specs: Spec[]
 }
