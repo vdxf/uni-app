@@ -16,3 +16,11 @@ export const reqCartList = () => {
     method: 'GET',
   })
 }
+//删除购物车单品
+export const reqDeleteCart = (data: { ids: string[] }) => {
+  return $reuqest({
+    url: '/member/cart',
+    method: 'DELETE',
+    data,
+  })
+}

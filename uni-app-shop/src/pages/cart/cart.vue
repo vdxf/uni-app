@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reqCartList } from '@/api/cart'
+import { reqCartList, reqDeleteCart } from '@/api/cart'
 import type { AddCartResult } from '@/api/cart/type'
 import { useMemberStore } from '@/stores'
 import { onShow } from '@dcloudio/uni-app'
@@ -14,6 +14,17 @@ const cartLsit = ref<AddCartResult[]>([])
 const getCartList = async () => {
   const res = await reqCartList()
   cartLsit.value = res.result
+}
+const handleDelete = async (skuId: string) => {
+  uni.showModal({
+    content: '确认是否删除此项？',
+    success: async (res) => {
+      if (res.confirm) {
+        await reqDeleteCart({ ids: [skuId] })
+        getCartList()
+      }
+    },
+  })
 }
 </script>
 
@@ -46,15 +57,13 @@ const getCartList = async () => {
               </navigator>
               <!-- 商品数量 -->
               <view class="count">
-                <text class="text">-</text>
-                <input class="input" type="number" :value="item.count.toString()" />
-                <text class="text">+</text>
+                <vk-data-input-number-box v-model="item.count" :min="1" :max="item.stock" />
               </view>
             </view>
             <!-- 右侧删除按钮 -->
             <template #right>
               <view class="cart-swipe-right">
-                <button class="button delete-button">删除</button>
+                <button class="button delete-button" @tap="handleDelete(item.skuId)">删除</button>
               </view>
             </template>
           </uni-swipe-action-item>

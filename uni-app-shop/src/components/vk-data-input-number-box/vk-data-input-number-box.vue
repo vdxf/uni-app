@@ -1,33 +1,56 @@
 <!-- 步进器 -->
 <template>
-  <view class="vk-data-input-number-box">
-    <view class="u-icon-minus" :class="{ 'u-icon-disabled': disabled || inputVal <= min }" :style="{
-      background: bgColor,
-      height: inputHeight + 'rpx',
-      color: color,
-      fontSize: size + 'rpx',
-      minHeight: '1.4em',
-    }" @click="emptyClick" @touchstart.prevent="btnTouchStart('minus')" @touchend.stop.prevent="clearTimer">
-      <view :style="'font-size:' + (Number(size) + 10) + 'rpx'" class="num-btn">－</view>
-    </view>
-    <input v-model="inputVal" :disabled="disabledInput || disabled" :cursor-spacing="getCursorSpacing"
-      :class="{ 'u-input-disabled': disabled }" class="u-number-input" type="number" :style="{
-        color: color,
-        fontSize: size + 'rpx',
-        background: bgColor,
-        height: inputHeight + 'rpx',
-        width: inputWidth + 'rpx',
-      }" @blur="onBlur" @click="showInput = true" />
-    <view class="u-icon-plus" :class="{ 'u-icon-disabled': disabled || inputVal >= max }" :style="{
-      background: bgColor,
-      height: inputHeight + 'rpx',
-      color: color,
-      fontSize: size + 'rpx',
-      minHeight: '1.4em',
-    }" @click="emptyClick" @touchstart.prevent="btnTouchStart('plus')" @touchend.stop.prevent="clearTimer">
-      <view :style="'font-size:' + (Number(size) + 10) + 'rpx'" class="num-btn">＋</view>
-    </view>
-  </view>
+	<view class="vk-data-input-number-box">
+		<view
+			class="u-icon-minus"
+			:class="{ 'u-icon-disabled': disabled || inputVal <= min }"
+			:style="{
+				background: bgColor,
+				height: inputHeight + 'rpx',
+				color: color,
+				fontSize: size + 'rpx',
+				minHeight: '1.4em'
+			}"
+			@click="emptyClick"
+			@touchstart.prevent="btnTouchStart('minus')"
+			@touchend.stop.prevent="clearTimer"
+		>
+			<view :style="'font-size:' + (Number(size) + 10) + 'rpx'" class="num-btn">－</view>
+		</view>
+		<input
+			v-model="inputVal"
+			:disabled="disabledInput || disabled"
+			:cursor-spacing="getCursorSpacing"
+			:class="{ 'u-input-disabled': disabled }"
+			class="u-number-input"
+			type="number"
+			:style="{
+				color: color,
+				fontSize: size + 'rpx',
+				background: bgColor,
+				height: inputHeight + 'rpx',
+				width: inputWidth + 'rpx'
+			}"
+			@blur="onBlur"
+			@click="showInput=true"
+		/>
+		<view
+			class="u-icon-plus"
+			:class="{ 'u-icon-disabled': disabled || inputVal >= max }"
+			:style="{
+				background: bgColor,
+				height: inputHeight + 'rpx',
+				color: color,
+				fontSize: size + 'rpx',
+				minHeight: '1.4em'
+			}"
+			@click="emptyClick"
+			@touchstart.prevent="btnTouchStart('plus')"
+			@touchend.stop.prevent="clearTimer"
+		>
+			<view :style="'font-size:' + (Number(size) + 10) + 'rpx'" class="num-btn">＋</view>
+		</view>
+	</view>
 </template>
 <script>
 /* eslint-disable */
@@ -223,6 +246,10 @@ export default {
 			// #ifndef VUE3
 			return this.value;
 			// #endif
+
+			// #ifdef VUE3
+			return this.modelValue;
+			// #endif
 		},
 		getCursorSpacing() {
 			// 先将值转为px单位，再转为数值
@@ -394,55 +421,54 @@ export default {
 
 <style lang="scss" scoped>
 .vk-data-input-number-box {
-  display: inline-flex;
-  align-items: center;
-  box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	box-sizing: border-box;
 }
 
 .u-number-input {
-  position: relative;
-  text-align: center;
-  padding: 0;
-  margin: 0rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2rpx solid #f4f4f4;
-  border-left: 0;
-  border-right: 0;
-  box-sizing: border-box;
+	position: relative;
+	text-align: center;
+	padding: 0;
+	margin: 0rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2rpx solid #f4f4f4;
+	border-left: 0;
+	border-right: 0;
+	box-sizing: border-box;
 }
 
 .u-icon-plus,
 .u-icon-minus {
-  width: 60rpx;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 2rpx solid #f4f4f4;
-  box-sizing: border-box;
+	width: 60rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border: 2rpx solid #f4f4f4;
+	box-sizing: border-box;
 }
 
 .u-icon-plus {
-  border-radius: 0 8rpx 8rpx 0;
+	border-radius: 0 8rpx 8rpx 0;
 }
 
 .u-icon-minus {
-  border-radius: 8rpx 0 0 8rpx;
+	border-radius: 8rpx 0 0 8rpx;
 }
 
 .u-icon-disabled {
-  color: #c8c9cc !important;
-  background-color: #f2f3f5 !important;
+	color: #c8c9cc !important;
+	background-color: #f2f3f5 !important;
 }
 
 .u-input-disabled {
-  color: #c8c9cc !important;
-  background-color: #f2f3f5 !important;
+	color: #c8c9cc !important;
+	background-color: #f2f3f5 !important;
 }
-
 .num-btn {
-  font-weight: 550;
-  line-height: 50rpx;
+	font-weight: 550;
+	line-height: 50rpx;
 }
 </style>
