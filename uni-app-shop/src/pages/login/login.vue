@@ -29,7 +29,8 @@ const handleLoginSimple = async () => {
   const res = await reqLoginSimple({ phoneNumber: phoneNumber.value })
   const memberStore = useMemberStore()
   memberStore.setProfile(res.result)
-  uni.switchTab({ url: '/pages/my/my' })
+  // uni.switchTab({ url: '/pages/my/my' })
+  uni.navigateBack()
   uni.showToast({
     title: '登录成功',
     icon: 'success',

@@ -9,3 +9,10 @@ export const reqAddCart = (data: CartParams) => {
     data,
   })
 }
+//获取购物车列表
+export const reqCartList = () => {
+  return $reuqest<AddCartResult[]>({
+    url: '/member/cart',
+    method: 'GET',
+  })
+}
