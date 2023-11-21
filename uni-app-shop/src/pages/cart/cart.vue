@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reqCartList, reqDeleteCart } from '@/api/cart'
+import { reqCartList, reqDeleteCart, reqUpdataCart } from '@/api/cart'
 import type { AddCartResult } from '@/api/cart/type'
+import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/type'
 import { useMemberStore } from '@/stores'
 import { onShow } from '@dcloudio/uni-app'
 import { ref } from 'vue'
@@ -25,6 +26,18 @@ const handleDelete = async (skuId: string) => {
       }
     },
   })
+}
+//修改商品数量
+const handleChangeNum = async (e: InputNumberBoxEvent) => {
+  const skuId = e.index
+  const count = e.value
+  await reqUpdataCart(
+    {
+      selected: true,
+      count,
+    },
+    skuId,
+  )
 }
 </script>
 
@@ -57,7 +70,8 @@ const handleDelete = async (skuId: string) => {
               </navigator>
               <!-- 商品数量 -->
               <view class="count">
-                <vk-data-input-number-box v-model="item.count" :min="1" :max="item.stock" />
+                <vk-data-input-number-box v-model="item.count" :min="1" :max="item.stock" :index="item.skuId"
+                  @change="handleChangeNum" />
               </view>
             </view>
             <!-- 右侧删除按钮 -->

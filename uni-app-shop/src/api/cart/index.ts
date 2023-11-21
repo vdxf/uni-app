@@ -1,5 +1,5 @@
 import { $reuqest } from '@/utils/request'
-import type { CartParams, AddCartResult } from './type'
+import type { CartParams, AddCartResult, UpdataCart } from './type'
 
 //加入购物车
 export const reqAddCart = (data: CartParams) => {
@@ -21,6 +21,14 @@ export const reqDeleteCart = (data: { ids: string[] }) => {
   return $reuqest({
     url: '/member/cart',
     method: 'DELETE',
+    data,
+  })
+}
+//修改购物车单品
+export const reqUpdataCart = (data: UpdataCart, skuId: string) => {
+  return $reuqes({
+    url: `/member/cart/${skuId}`,
+    method: 'PUT',
     data,
   })
 }

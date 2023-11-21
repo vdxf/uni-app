@@ -17,3 +17,7 @@ export interface AddCartResult {
   isEffective: boolean
   id: string
 }
+export interface UpdataCart {
+  selected?: boolean
+  count?: number
+}
