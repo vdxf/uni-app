@@ -50,6 +50,36 @@ const handleChangeSelectAll = () => {
   })
   reqSelectAll({ selected: _isSelectedAll })
 }
+//计算选中商品列表
+const selectedCartList = computed(() => {
+  return cartList.value.filter((i) => i.selected)
+})
+//选中总件数
+const selectedTotal = computed(() => {
+  return selectedCartList.value.reduce((sum, item) => {
+    return sum + item.count
+  }, 0)
+})
+//总价格
+const totalPrice = computed(() => {
+  return selectedCartList.value
+    .reduce((sum, item) => {
+      return sum + item.count * Number(item.nowPrice)
+    }, 0)
+    .toFixed(2)
+})
+//结算
+const handleToPayment = () => {
+  if (selectedTotal.value === 0) {
+    uni.showToast({
+      icon: 'none',
+      title: '请选择商品',
+    })
+  }
+  uni.showToast({
+    title: '等待结算',
+  })
+}
 </script>
 
 <template>
@@ -106,9 +136,11 @@ const handleChangeSelectAll = () => {
       <view class="toolbar">
         <text class="all" @tap="handleChangeSelectAll" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
-        <text class="amount">100</text>
+        <text class="amount">{{ totalPrice }}</text>
         <view class="button-grounp">
-          <view class="button payment-button" :class="{ disabled: true }"> 去结算(10) </view>
+          <view class="button payment-button" @tap="handleToPayment" :class="{ disabled: selectedTotal === 0 }">
+            去结算({{ selectedTotal }})
+          </view>
         </view>
       </view>
     </template>
