@@ -1,21 +1,22 @@
 <script setup lang="ts">
-import { reqCartList, reqDeleteCart, reqUpdataCart } from '@/api/cart'
+import { reqCartList, reqDeleteCart, reqUpdataCart, reqSelectAll } from '@/api/cart'
 import type { AddCartResult } from '@/api/cart/type'
 import type { InputNumberBoxEvent } from '@/components/vk-data-input-number-box/type'
 import { useMemberStore } from '@/stores'
 import { onShow } from '@dcloudio/uni-app'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 const memberStore = useMemberStore()
 onShow(() => {
   if (memberStore.profile) {
     getCartList()
   }
 })
-const cartLsit = ref<AddCartResult[]>([])
+const cartList = ref<AddCartResult[]>([])
 const getCartList = async () => {
   const res = await reqCartList()
-  cartLsit.value = res.result
+  cartList.value = res.result
 }
+//删除
 const handleDelete = async (skuId: string) => {
   uni.showModal({
     content: '确认是否删除此项？',
@@ -29,15 +30,25 @@ const handleDelete = async (skuId: string) => {
 }
 //修改商品数量
 const handleChangeNum = async (e: InputNumberBoxEvent) => {
-  const skuId = e.index
   const count = e.value
-  await reqUpdataCart(
-    {
-      selected: true,
-      count,
-    },
-    skuId,
-  )
+  await reqUpdataCart({ count }, e.index)
+}
+//选中状态改变
+const handleSelect = (item: AddCartResult) => {
+  item.selected = !item.selected
+  reqUpdataCart({ selected: item.selected }, item.skuId)
+}
+//计算全选状态
+const isSelectedAll = computed(() => {
+  return cartList.value.every((item) => item.selected)
+})
+//改变全选
+const handleChangeSelectAll = () => {
+  const _isSelectedAll = !isSelectedAll.value
+  cartList.value.forEach((item) => {
+    item.selected = _isSelectedAll
+  })
+  reqSelectAll({ selected: _isSelectedAll })
 }
 </script>
 
@@ -46,7 +57,7 @@ const handleChangeNum = async (e: InputNumberBoxEvent) => {
     <!-- 已登录: 显示购物车 -->
     <template v-if="memberStore.profile">
       <!-- 购物车列表 -->
-      <view class="cart-list" v-if="cartLsit.length">
+      <view class="cart-list" v-if="cartList.length">
         <!-- 优惠提示 -->
         <view class="tips">
           <text class="label">满减</text>
@@ -55,11 +66,11 @@ const handleChangeNum = async (e: InputNumberBoxEvent) => {
         <!-- 滑动操作分区 -->
         <uni-swipe-action>
           <!-- 滑动操作项 -->
-          <uni-swipe-action-item v-for="item in cartLsit" :key="item.skuId" class="cart-swipe">
+          <uni-swipe-action-item v-for="item in cartList" :key="item.skuId" class="cart-swipe">
             <!-- 商品信息 -->
             <view class="goods">
               <!-- 选中状态 -->
-              <text class="checkbox" :class="{ checked: item.selected }"></text>
+              <text class="checkbox" @tap="handleSelect(item)" :class="{ checked: item.selected }"></text>
               <navigator :url="`/pages/detail/detail?id=${item.id}`" hover-class="none" class="navigator">
                 <image mode="aspectFill" class="picture" :src="item.picture"></image>
                 <view class="meta">
@@ -93,7 +104,7 @@ const handleChangeNum = async (e: InputNumberBoxEvent) => {
       </view>
       <!-- 吸底工具栏 -->
       <view class="toolbar">
-        <text class="all" :class="{ checked: true }">全选</text>
+        <text class="all" @tap="handleChangeSelectAll" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
         <text class="amount">100</text>
         <view class="button-grounp">

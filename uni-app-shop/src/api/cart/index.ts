@@ -26,8 +26,16 @@ export const reqDeleteCart = (data: { ids: string[] }) => {
 }
 //修改购物车单品
 export const reqUpdataCart = (data: UpdataCart, skuId: string) => {
-  return $reuqes({
+  return $reuqest({
     url: `/member/cart/${skuId}`,
+    method: 'PUT',
+    data,
+  })
+}
+//全选 / 取消全选
+export const reqSelectAll = (data: { selected: boolean }) => {
+  return $reuqest({
+    url: `/member/cart/selected`,
     method: 'PUT',
     data,
   })
