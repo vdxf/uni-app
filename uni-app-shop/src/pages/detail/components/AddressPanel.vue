@@ -1,6 +1,24 @@
 <script setup lang="ts">
+import type { AddressItem } from '@/api/address/type'
+import { useAddressStore } from '@/stores/modules/address'
+import { computed, ref } from 'vue'
+const addressStore = useAddressStore()
+
+//修改收货地址
+const activeIndex = ref<number>(-1)
+const handleChangeAddress = (item: AddressItem, index: number) => {
+  activeIndex.value = index
+  addressStore.changeSelectedAddress(item)
+}
+const selectedAddress = computed(() => {
+  return addressStore.selectedAddress
+})
+
 const emit = defineEmits<{
   (event: 'close'): void
+}>()
+const props = defineProps<{
+  addressList: AddressItem[]
 }>()
 </script>
 
@@ -12,25 +30,18 @@ const emit = defineEmits<{
     <view class="title">配送至</view>
     <!-- 内容 -->
     <view class="content">
-      <view class="item">
-        <view class="user">李明 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-checked"></text>
-      </view>
-      <view class="item">
-        <view class="user">王东 13824686868</view>
-        <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-        <text class="icon icon-ring"></text>
-      </view>
-      <view class="item">
-        <view class="user">张三 13824686868</view>
-        <view class="address">北京市朝阳区孙河安平北街6号院</view>
-        <text class="icon icon-ring"></text>
+      <view class="item" v-for="(item, index) in props.addressList" :key="item.id"
+        @tap="handleChangeAddress(item, index)">
+        <view class="user">{{ item.receiver }} {{ item.contact }}</view>
+        <view class="address">{{ item.fullLocation }} {{ item.address }}</view>
+        <text class="icon" :class="{ 'icon-checked': activeIndex === index }"></text>
       </view>
     </view>
     <view class="footer">
-      <view class="button primary"> 新建地址 </view>
-      <view v-if="false" class="button primary">确定</view>
+      <navigator class="button primary" url="/subPage/address/address" open-type="navigate" hover-class="navigator-hover">
+        新建地址
+      </navigator>
+      <view v-if="selectedAddress" @tap="emit('close')" class="button primary">确定</view>
     </view>
   </view>
 </template>

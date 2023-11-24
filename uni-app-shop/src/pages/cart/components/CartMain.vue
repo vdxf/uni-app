@@ -76,15 +76,12 @@ const totalPrice = computed(() => {
 //结算
 const handleToPayment = () => {
   if (selectedTotal.value === 0) {
-    uni.showToast({
+    return uni.showToast({
       icon: 'none',
       title: '请选择商品',
     })
-  } else {
-    uni.showToast({
-      title: '等待结算',
-    })
   }
+  uni.navigateTo({ url: '/pagesOrder/create/create' })
 }
 </script>
 
@@ -139,10 +136,7 @@ const handleToPayment = () => {
         </navigator>
       </view>
       <!-- 吸底工具栏 -->
-      <view class="toolbar" :style="{
-        paddingBottom: safeAreaInsets?.bottom + 'px',
-        paddingTop: safeAreaInsets?.bottom + 'px',
-      }">
+      <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
         <text class="all" @tap="handleChangeSelectAll" :class="{ checked: isSelectedAll }">全选</text>
         <text class="text">合计:</text>
         <text class="amount">{{ totalPrice }}</text>
@@ -387,6 +381,7 @@ const handleToPayment = () => {
   border-top: 1rpx solid #ededed;
   border-bottom: 1rpx solid #ededed;
   background-color: #fff;
+  box-sizing: content-box;
 
   .all {
     margin-left: 25rpx;
@@ -432,7 +427,7 @@ const handleToPayment = () => {
   .button-grounp {
     position: absolute;
     right: 10rpx;
-    top: 50%;
+    top: 30%;
 
     display: flex;
     justify-content: space-between;

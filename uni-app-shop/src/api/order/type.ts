@@ -34,3 +34,20 @@ export interface Summary {
   postFee: number
   discountPrice: number
 }
+export interface OrderParams {
+  skuId: string
+  count: string
+  addressId?: string
+}
+export interface SubmitParams {
+  goods: GoodItem[]
+  addressId: string
+  deliveryTimeType: number
+  buyerMessage: string
+  payType: number
+  payChannel: number
+}
+export interface GoodItem {
+  skuId: string
+  count: number
+}

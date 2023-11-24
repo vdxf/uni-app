@@ -1,17 +1,58 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
-import { reqOrderInfo } from '../../api/order'
-import type { OrderResult } from '../../api/order/type'
+import { reqNowOrderInfo, reqOrderInfo, reqSubmitOrder } from '@/api/order'
+import type { OrderResult } from '@/api/order/type'
+import { useAddressStore } from '@/stores/modules/address'
 
 onLoad(() => {
   getOrderInfo()
 })
+//从商品详情跳转
+const props = defineProps<{
+  skuId: string
+  count: string
+}>()
+//获取订单列表
 const orderInfo = ref<OrderResult>()
 const getOrderInfo = async () => {
-  const res = await reqOrderInfo()
-  orderInfo.value = res.result
+  if (props.skuId && props.count) {
+    const res = await reqNowOrderInfo({
+      skuId: props.skuId,
+      count: props.count,
+    })
+    orderInfo.value = res.result
+  } else {
+    const res = await reqOrderInfo()
+    orderInfo.value = res.result
+  }
 }
+//默认地址
+const addressStore = useAddressStore()
+const selectedAddress = computed(() => {
+  return (
+    addressStore.selectedAddress || orderInfo.value?.userAddresses.find((item) => item.isDefault)
+  )
+})
+//提交订单
+const handleSubmit = async () => {
+  const addressId = selectedAddress.value?.id
+  const res = await reqSubmitOrder({
+    goods: orderInfo.value?.goods.map((item) => {
+      return {
+        skuId: item.skuId,
+        count: item.count,
+      }
+    })!,
+    addressId: addressId!,
+    deliveryTimeType: deliveryList.value[activeIndex.value].type,
+    buyerMessage: buyerMessage.value,
+    payType: 1,
+    payChannel: 1,
+  })
+  console.log('res => ', res)
+}
+
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // 订单备注
@@ -35,9 +76,11 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 <template>
   <scroll-view scroll-y class="viewport">
     <!-- 收货地址 -->
-    <navigator v-if="false" class="shipment" hover-class="none" url="/subPage/address/address?from=order">
-      <view class="user"> 张三 13333333333 </view>
-      <view class="address"> 广东省 广州市 天河区 黑马程序员3 </view>
+    <navigator v-if="selectedAddress" class="shipment" hover-class="none" url="/subPage/address/address?from=order">
+      <view class="user"> {{ selectedAddress.receiver }} {{ selectedAddress.contact }} </view>
+      <view class="address">
+        {{ selectedAddress.fullLocation }} {{ selectedAddress.address }}
+      </view>
       <text class="icon icon-right"></text>
     </navigator>
     <navigator v-else class="shipment" hover-class="none" url="/pagesMember/address/address?from=order">
@@ -47,16 +90,17 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 
     <!-- 商品信息 -->
     <view class="goods">
-      <navigator v-for="item in 2" :key="item" :url="`/pages/goods/goods?id=1`" class="item" hover-class="none">
-        <image class="picture" src="https://yanxuan-item.nosdn.127.net/c07edde1047fa1bd0b795bed136c2bb2.jpg" />
+      <navigator v-for="item in orderInfo?.goods" :key="item.skuId" :url="`/pages/goods/goods?id=${item.id}`" class="item"
+        hover-class="none">
+        <image class="picture" :src="item.picture" />
         <view class="meta">
-          <view class="name ellipsis"> ins风小碎花泡泡袖衬110-160cm </view>
-          <view class="attrs">藏青小花 130</view>
+          <view class="name ellipsis"> {{ item.name }} </view>
+          <view class="attrs">{{ item.attrsText }}</view>
           <view class="prices">
-            <view class="pay-price symbol">99.00</view>
-            <view class="price symbol">99.00</view>
+            <view class="pay-price symbol">{{ item.payPrice }}</view>
+            <view class="price symbol">{{ item.price }}</view>
           </view>
-          <view class="count">x5</view>
+          <view class="count">x{{ item.count }}</view>
         </view>
       </navigator>
     </view>
@@ -79,11 +123,11 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
     <view class="settlement">
       <view class="item">
         <text class="text">商品总价: </text>
-        <text class="number symbol">495.00</text>
+        <text class="number symbol">{{ orderInfo?.summary.totalPrice.toFixed(2) }}</text>
       </view>
       <view class="item">
         <text class="text">运费: </text>
-        <text class="number symbol">5.00</text>
+        <text class="number symbol">{{ orderInfo?.summary.postFee.toFixed(2) }}</text>
       </view>
     </view>
   </scroll-view>
@@ -91,9 +135,9 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
   <!-- 吸底工具栏 -->
   <view class="toolbar" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
     <view class="total-pay symbol">
-      <text class="number">99.00</text>
+      <text class="number">{{ orderInfo?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }"> 提交订单 </view>
+    <view class="button" :class="{ disabled: true }" @tap="handleSubmit"> 提交订单 </view>
   </view>
 </template>
 
