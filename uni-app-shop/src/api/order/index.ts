@@ -17,7 +17,7 @@ export const reqNowOrderInfo = (data: OrderParams) => {
 }
 //提交订单
 export const reqSubmitOrder = (data: SubmitParams) => {
-  return $reuqest({
+  return $reuqest<{ id: string }>({
     url: '/member/order',
     method: 'POST',
     data,

@@ -36,21 +36,26 @@ const selectedAddress = computed(() => {
 })
 //提交订单
 const handleSubmit = async () => {
-  const addressId = selectedAddress.value?.id
+  if (!selectedAddress.value?.id) {
+    return uni.showToast({
+      icon: 'none',
+      title: '请选择收货地址',
+    })
+  }
   const res = await reqSubmitOrder({
-    goods: orderInfo.value?.goods.map((item) => {
+    goods: orderInfo.value!.goods.map((item) => {
       return {
         skuId: item.skuId,
         count: item.count,
       }
-    })!,
-    addressId: addressId!,
-    deliveryTimeType: deliveryList.value[activeIndex.value].type,
+    }),
+    addressId: selectedAddress.value?.id,
+    deliveryTimeType: activeDelivery.value.type,
     buyerMessage: buyerMessage.value,
     payType: 1,
     payChannel: 1,
   })
-  console.log('res => ', res)
+  uni.redirectTo({ url: `/pagesOrder/detail/detail?id=${res.result.id}` })
 }
 
 // 获取屏幕边界到安全区域距离
@@ -83,7 +88,7 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
       </view>
       <text class="icon icon-right"></text>
     </navigator>
-    <navigator v-else class="shipment" hover-class="none" url="/pagesMember/address/address?from=order">
+    <navigator v-else class="shipment" hover-class="none" url="/subPage/address/address?from=order">
       <view class="address"> 请选择收货地址 </view>
       <text class="icon icon-right"></text>
     </navigator>
@@ -137,7 +142,9 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
     <view class="total-pay symbol">
       <text class="number">{{ orderInfo?.summary.totalPayPrice.toFixed(2) }}</text>
     </view>
-    <view class="button" :class="{ disabled: true }" @tap="handleSubmit"> 提交订单 </view>
+    <view class="button" :class="{ disabled: !selectedAddress?.id }" @tap="handleSubmit">
+      提交订单
+    </view>
   </view>
 </template>
 
