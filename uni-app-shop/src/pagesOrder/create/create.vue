@@ -1,17 +1,27 @@
 <script setup lang="ts">
 import { onLoad } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
-import { reqNowOrderInfo, reqOrderInfo, reqSubmitOrder } from '@/api/order'
+import { reqNowOrderInfo, reqOrderInfo, reqOrderSecond, reqSubmitOrder } from '@/api/order'
 import type { OrderResult } from '@/api/order/type'
 import { useAddressStore } from '@/stores/modules/address'
 
 onLoad(() => {
-  getOrderInfo()
+  if (props.orderId) {
+    getOrderSecond()
+  } else {
+    getOrderInfo()
+  }
 })
+//再次购买
+const getOrderSecond = async () => {
+  const res = await reqOrderSecond(props.orderId)
+  orderInfo.value = res.result
+}
 //从商品详情跳转
 const props = defineProps<{
   skuId: string
   count: string
+  orderId: string
 }>()
 //获取订单列表
 const orderInfo = ref<OrderResult>()
