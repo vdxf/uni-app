@@ -2,6 +2,10 @@
 import { useMemberStore } from '@/stores'
 import GuessLike from '@/components/GuessLike.vue'
 import { useGuessList } from '@/hooks'
+import type { ListParams } from '@/api/order/type'
+import { reqOrderList } from '@/api/order'
+import { onLoad } from '@dcloudio/uni-app'
+import { reactive } from 'vue'
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
 // 订单选项
@@ -13,6 +17,19 @@ const orderTypes = [
 ]
 const memberStore = useMemberStore()
 const { guessRef, handleReachBottom } = useGuessList()
+
+onLoad(() => {
+  getOrderList()
+})
+const query = reactive<ListParams>({
+  page: 1,
+  pageSize: 10,
+  orderState: 0,
+})
+const getOrderList = async () => {
+  const res = await reqOrderList(query)
+  console.log('res => ', res)
+}
 </script>
 
 <template>

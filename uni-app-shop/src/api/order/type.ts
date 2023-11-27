@@ -147,3 +147,28 @@ export interface ListItem {
   text: string
   time: string
 }
+export interface ListParams {
+  page?: number
+  pageSize?: number
+  orderState?: number
+}
+export interface ListResult {
+  counts: number
+  pageSize: string
+  pages: string
+  page: string
+  items: ResultItem[]
+}
+export interface ResultItem {
+  id: string
+  createTime: string
+  payType: number
+  orderState: number
+  payLatestTime: string
+  countdown: number
+  postFee: number
+  payMoney: number
+  totalMoney: number
+  totalNum: string
+  skus: SkuItem[]
+}

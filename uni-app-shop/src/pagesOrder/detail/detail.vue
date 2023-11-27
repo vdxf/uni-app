@@ -138,13 +138,20 @@ const handleOrderReceive = async () => {
 }
 //删除订单
 const handleDelOrder = async () => {
-  const res = await reqDelOrder({ ids: [query.id] })
-  console.log('res => ', res)
+  uni.showModal({
+    content: '是否删除订单？',
+    success: async (res) => {
+      if (res.confirm) {
+        await reqDelOrder({ ids: [query.id] })
+        uni.redirectTo({ url: '/pagesOrder/list/list' })
+      }
+    },
+  })
 }
 //取消订单
 const handleCancelOrder = async () => {
   await reqCancelOrder({ cancelReason: reason.value }, query.id)
-  orderDetail.value.orderState = OrderState.YiQuXiao
+  orderDetail.value!.orderState = OrderState.YiQuXiao
   uni.showToast({
     title: '取消成功',
   })
@@ -221,7 +228,7 @@ const handleCancelOrder = async () => {
             <image class="cover" :src="item.image"></image>
             <view class="meta">
               <view class="name ellipsis">{{ item.name }}</view>
-              <view class="type">{{ item.attresText }}</view>
+              <view class="type">{{ item.attrsText }}</view>
               <view class="price">
                 <view class="actual">
                   <text class="symbol">¥</text>
@@ -267,7 +274,6 @@ const handleCancelOrder = async () => {
 
       <!-- 猜你喜欢 -->
       <GuessLike ref="guessRef" />
-      <p>11111111111111111</p>
 
       <!-- 底部操作栏 -->
       <view class="toolbar-height" :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }"></view>
@@ -283,11 +289,17 @@ const handleCancelOrder = async () => {
             再次购买
           </navigator>
           <!-- 待收货状态: 展示确认收货 -->
-          <view class="button primary"> 确认收货 </view>
+          <view class="button primary" v-if="orderDetail.orderState === OrderState.DaiShouHuo">
+            确认收货
+          </view>
           <!-- 待评价状态: 展示去评价 -->
-          <view class="button"> 去评价 </view>
+          <view class="button" v-if="orderDetail.orderState === OrderState.DaiPingJia">
+            去评价
+          </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view class="button delete" @tap="handleDelOrder"> 删除订单 </view>
+          <view class="button delete" @tap="handleDelOrder" v-if="orderDetail.orderState >= OrderState.DaiPingJia">
+            删除订单
+          </view>
         </template>
       </view>
     </template>

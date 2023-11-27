@@ -6,6 +6,8 @@ import type {
   OredrDetail,
   SendResult,
   LogisticsResult,
+  ListParams,
+  ListResult,
 } from './type'
 //获取预付订单
 export const reqOrderInfo = () => {
@@ -78,6 +80,14 @@ export const reqCancelOrder = (data: { cancelReason: string }, id: string) => {
   return $reuqest<OredrDetail>({
     url: `/member/order/${id}/cancel`,
     method: 'PUT',
+    data,
+  })
+}
+//获取订单列表 /member/order
+export const reqOrderList = (data: ListParams) => {
+  return $reuqest<ListResult>({
+    url: `/member/order`,
+    method: 'GET',
     data,
   })
 }
